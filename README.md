@@ -1,4 +1,4 @@
-# TON Mini App QA Infra — AI-assisted regression infrastructure
+# TMA Autotest Infra — AI QA infrastructure for TON builders
 
 
 <p align="center">
@@ -25,10 +25,10 @@
 
 </p>
 
-AI-assisted regression infrastructure for Telegram Mini Apps on TON.
+AI QA infrastructure for Telegram Mini Apps, TON Connect flows, and wallet-related UI journeys on TON.
 
 The system turns an exploratory browser session executed by an AI agent into a repeatable automated regression test.  
-It allows teams to validate UI flows, capture interaction traces, generate automated tests, inspect execution artifacts, and apply TON-aware checks to critical wallet and connection scenarios.
+It allows teams to validate UI flows, capture interaction traces, generate automated tests, inspect execution artifacts, and now apply TON-aware runtime checks to critical wallet and connect scenarios.
 
 ---
 
@@ -41,69 +41,62 @@ Track 1: Agent Infrastructure
 
 # Problem
 
-Teams building Telegram Mini Apps and TON-native web products constantly change onboarding flows, wallet connection steps, network selectors, modal logic, and release-critical UI behavior.
+Teams building Telegram Mini Apps and TON-related web products constantly modify onboarding flows, wallet connection steps, network selection states, and interface logic.
 
 Manual regression testing is slow and expensive, while traditional record-and-replay tools tend to break when the UI changes.
 
-As a result, TON builder teams often lack reliable regression coverage for critical interaction flows such as:
-
-- opening `TON Connect`
-- switching `Any Network` to `Testnet`
-- checking wallet connection methods
-- validating wallet modal visibility
-- rechecking copy-link and related wallet entry points
+As a result, teams often lack reliable regression coverage for critical interaction flows, especially around TON Connect and wallet-facing user journeys.
 
 ---
 
 # Solution
-
 <p align="center">
   <img src="images/menu.jpg" width="420"/>
 </p>
-
 The system provides an AI-assisted QA pipeline:
 
 1. The user describes the verification goal and configures the reasoning level for the agent.
 2. The AI agent explores the interface inside a browser environment, interacting with the UI similarly to a human user.
-3. During exploration, the backend records a structured action trace.
-4. The trace is distilled into a deterministic replay autotest.
-5. The generated autotest can later be rerun on demand or by schedule.
-6. After execution, the team receives a final report with screenshots, timeline events, diagnostics, and TON-aware checks.
+3. During exploration the agent forms hypotheses about possible checks and interacts with elements accordingly.
+4. The generated test can later be rerun in a deterministic execution mode (via timer or other triggers).
+5. After execution the team receives a final report, timeline events, screenshots, diagnostics, and TON-aware check results.
 
 The report includes either:
 
-- confirmation of successful execution, or
-- recommendations describing problems detected during the replay run
+- confirmation of successful execution, or  
+- recommendations describing problems detected during the agent or script execution.
 
-This approach allows TON teams to move much faster from exploratory UI testing to repeatable regression coverage.
+This approach allows teams to move much faster from exploratory UI testing to repeatable regression coverage.
 
-Additionally, it helps evaluate how understandable and usable the interface is from the perspective of an autonomous agent.
+Additionally, it helps evaluate how understandable and usable the interface is from the perspective of an autonomous agent, while also validating TON-specific UI states such as wallet-connect modals, Testnet selection, and copy-link availability.
 
 ---
 
 # TON QA Pack
 
-This submission includes a TON-aware assertion layer on top of the generic replay runtime.
+The project now includes a TON-aware assertion layer on top of the replay runtime.
 
-Current TON-aware checks cover:
+This means generated autotests can validate not only generic browser behavior, but also TON-specific UI conditions relevant for builder teams.
+
+Current TON-aware checks include:
 
 - TON Connect markers on the page
-- `Testnet` visibility
+- Testnet selection visibility
 - `Connect Wallet` visibility
 - TON Connect modal visibility
-- wallet method presence
+- wallet methods presence
 - `Copy link` visibility
 - optional Telegram Mini App context markers
 
-This means the platform is not only replaying generic browser actions. It can also validate TON-specific UI states that matter to teams shipping Telegram Mini Apps and wallet-related flows.
+These checks are surfaced in run artifacts and UI summaries as TON checks, which makes the product closer to TON-native QA infrastructure rather than a generic browser automation demo.
 
 ---
 
 # MCP Integration
 
-The platform now exposes a lightweight MCP adapter over the backend.
+The system now also includes a lightweight MCP adapter so external agent systems can use the infrastructure programmatically.
 
-Available MCP tools:
+Current MCP tool surface:
 
 - `run_exploration`
 - `save_trace`
@@ -112,7 +105,7 @@ Available MCP tools:
 - `get_run_status`
 - `get_run_artifact`
 
-This makes the infrastructure usable not only through the main UI, but also by external agent systems that need to trigger exploratory runs, generate autotests, and fetch run artifacts programmatically.
+This MCP layer is intentionally thin: it exposes the existing backend workflow as reusable infrastructure for other agents and automation systems.
 
 ---
 
@@ -143,14 +136,15 @@ Validated interaction flow:
 7. Generate an autotest from the trace.
 8. Rerun the generated autotest and inspect run artifacts.
 
-This scenario has already been validated end-to-end in the product.
+This scenario has already been validated end-to-end in the core product.
 
 The demo shows:
 
-- how the agent reasons about the interface
-- how it interacts with UI elements
-- how the exploratory run becomes a replayable regression asset
-- how TON-aware checks are attached to the replay flow
+- how the agent reasons about the interface  
+- how it interacts with UI elements  
+- how high-quality grounding enables reliable UI interaction
+- how the generated replay can include TON-aware checks
+- how rerun artifacts expose TON-specific validation results
 
 ---
 
@@ -162,17 +156,38 @@ The interface is first explored by an AI agent capable of reasoning about UI ele
 
 The resulting interaction trace becomes the source for a separate repeatable automated test.
 
-The replay runtime can then apply TON-aware checks to wallet and connection-related scenarios.
+This makes the system closer to **AI-assisted QA infrastructure** rather than a traditional record-and-replay tool.
 
-This makes the system closer to **AI-assisted QA infrastructure for TON builders** rather than a traditional record-and-replay tool.
+With the current TON-oriented additions, the platform is better positioned as infrastructure for teams shipping Telegram Mini Apps and TON Connect experiences, not just as generic browser QA.
 
 ---
 
 # Repository Contents
 
-- [`ARCHITECTURE.md`](./ARCHITECTURE.md) — system architecture and component responsibilities
-- [`DEMO.md`](./DEMO.md) — demo walkthrough and expected results
-- [`ADDITIONAL_NOTES.md`](./ADDITIONAL_NOTES.md) — limitations and submission notes
+- [`ARCHITECTURE.md`](./ARCHITECTURE.md) — system architecture and component responsibilities  
+- [`DEMO.md`](./DEMO.md) — demo walkthrough and expected results  
+- [`ADDITIONAL_NOTES.md`](./ADDITIONAL_NOTES.md) — notes for hackathon judges about implementation details and current limitations  
+
+---
+
+# Private Core Notice
+
+The core implementation of the product is currently private.
+
+This repository serves as a **public showcase repository** for the hackathon submission and intentionally contains:
+
+- product overview
+- architecture summary
+- validated demo flow
+- submission-facing documentation
+- public-facing integration narrative for TON QA Pack and MCP support
+
+The private repository contains:
+
+- production backend
+- browser runtime
+- trace-to-test generation pipeline
+- internal integrations
 
 ---
 
@@ -187,21 +202,14 @@ Current capabilities include:
 - autotest generation
 - deterministic test rerun
 - artifact inspection
-- TON-aware checks in replay artifacts
+- TON-aware runtime checks
 - MCP-facing integration surface
 
 ---
 
 # Scope of This Submission
 
-This submission focuses on **builder infrastructure for Telegram Mini Apps and TON Connect flows**.
-
-It does not focus on:
-
-- TON payments
-- real on-chain execution
-- wallet approvals inside external wallet apps
-- a consumer-facing chat agent
+This submission focuses on **QA infrastructure for Telegram Mini Apps, TON Connect flows, and wallet-related UI journeys**.
 
 The core value of the system is the pipeline:
 
@@ -209,12 +217,14 @@ The core value of the system is the pipeline:
 explore -> trace -> generate test -> rerun -> inspect artifacts
 ```
 
-At the current stage, the platform is aimed at UI regression and release-safety workflows for TON teams.
 
----
+Monitoring and payment management are currently handled through a Telegram bot and fiat payment flows.
 
-# Additional Notes
+The current infrastructure focus is:
 
-- Demo walkthrough: [DEMO.md](./DEMO.md)
-- Architecture: [ARCHITECTURE.md](./ARCHITECTURE.md)
-- Limitations and submission notes: [ADDITIONAL_NOTES.md](./ADDITIONAL_NOTES.md)
+- release-safe UI regression for TON builder teams
+- TON-aware replay validation
+- artifact-based inspection
+- external agent access through MCP
+
+In an upcoming release, the platform can be extended further with deeper MCP workflows and native payment support through the TON ecosystem.
