@@ -1,15 +1,7 @@
-# TMA Autotest Infra
+# Computer Use Mode for Q/A with Re-Act Agents
 
 <p align="center">
   <img src="images/logo.jpg" width="420"/>
-</p>
-
-<p align="center">
-
-<img src="https://img.shields.io/badge/TON-AI%20Hackathon-black"/>
-<img src="https://img.shields.io/badge/Track-Agent%20Infrastructure-blue"/>
-<img src="https://img.shields.io/badge/QA-Autotest%20Infra-purple"/>
-
 </p>
 
 <p align="center">
