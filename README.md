@@ -165,19 +165,6 @@ Current capabilities include:
 
 # Scope of This Submission
 
-This submission focuses on **QA infrastructure for Telegram Mini Apps and TON-related web flows**.
-
-It does not focus on TON payments or on a consumer-facing chat agent.
-
-The core value of the system is the pipeline:
-
-```
-
-explore -> trace -> generate test -> rerun -> inspect artifacts
-
-```
-
-At the current stage, direct payment integration with TON is not implemented.
 
 Monitoring and payment management are currently handled through a Telegram bot and fiat payment flows.
 
