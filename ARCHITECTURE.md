@@ -21,7 +21,7 @@ The agent is responsible for discovering and completing the scenario. The genera
 
 ### VLM-Based Agent
 
-The exploratory layer is driven by an open-source VLM-based agent core that can reason over the visible browser state and use browser tools to move through the interface.
+The exploratory layer is driven by an open-source VLM-based agent (created from CodeAgent smolagents) core that can reason over the visible browser state and use browser tools to move through the interface.
 
 The agent follows a reasoning + action paradigm:
 
@@ -48,6 +48,8 @@ The agent loop is built around iterative decision making instead of static scrip
 - produce a semantically meaningful execution trace
 
 That trace becomes the bridge between intelligent exploration and deterministic replay.
+
+
 
 ## Core Pipeline
 
