@@ -82,7 +82,7 @@ Validated interaction flow:
 
 <p align="center">
 <a href="https://youtu.be/AuMUIWpe7jE">
-  <img src="images/specs.jpg" width="420"/>
+  <img src="images/specs.jpg" width="720"/>
 </a>
 </p>
 
