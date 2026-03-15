@@ -164,3 +164,9 @@ The core value of the system is the pipeline:
 explore -> trace -> generate test -> rerun -> inspect artifacts
 
 ```
+
+At the current stage, direct payment integration with TON is not implemented.
+
+Monitoring and payment management are currently handled through a Telegram bot and fiat payment flows.
+
+In an upcoming release, the platform will introduce MCP connectivity, allowing external agents and systems to interact with the infrastructure, as well as native payment support through the TON ecosystem.
