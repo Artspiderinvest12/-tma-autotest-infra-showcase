@@ -52,7 +52,9 @@ As a result, teams often lack reliable regression coverage for critical interact
 # Solution
 
 The system provides an AI-assisted QA pipeline.
-
+<p align="center">
+  <img src="images/menu.jpg" width="420"/>
+</p>
 1. The user describes the verification goal and configures the reasoning level for the agent.
 2. The AI agent explores the interface inside a browser environment, interacting with the UI similarly to a human user.
 3. During exploration the agent forms hypotheses about possible checks and interacts with elements accordingly.
@@ -77,6 +79,10 @@ Current public target:
 `https://tonconnect-sdk-demo-dapp.vercel.app/`
 
 Validated interaction flow:
+
+<p align="center">
+  <img src="images/specs.jpg" width="420"/>
+</p>
 
 1. Open the official TON Connect demo dApp.
 2. Switch `Any Network` to `Testnet`.
