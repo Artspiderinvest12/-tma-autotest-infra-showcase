@@ -1,4 +1,5 @@
-# Computer Use Mode for Q/A with Re-Act Agents
+# TMA Autotest Infra — AI QA infrastructure
+
 
 <p align="center">
   <img src="images/logo.jpg" width="420"/>
@@ -26,36 +27,56 @@
 
 AI QA infrastructure for Telegram Mini Apps and TON-related web flows.
 
-The product turns an exploratory browser session completed by an AI agent into a repeatable automated regression test. The system captures the action trace, generates an autotest from that trace, reruns the generated script, and stores run artifacts such as screenshots, timeline events, and diagnostics.
+The system turns an exploratory browser session executed by an AI agent into a repeatable automated regression test.  
+It allows teams to validate UI flows, capture interaction traces, generate automated tests, and inspect execution artifacts.
 
-## Hackathon Track
+---
+
+# Hackathon Track
 
 TON AI Agent Hackathon 2026  
 Track 1: Agent Infrastructure
 
-## Problem
+---
 
-Teams building Telegram Mini Apps and TON-related web products constantly change onboarding steps, wallet connection flows, and interface logic. Manual regression checks are slow, and traditional record-and-replay tools are often too fragile when the UI evolves.
+# Problem
 
-## Solution
+Teams building Telegram Mini Apps and TON-related web products constantly modify onboarding flows, wallet connection steps, and interface logic.
 
-TMA Autotest Infra provides an AI-assisted QA pipeline:
+Manual regression testing is slow and expensive, while traditional record-and-replay tools tend to break when the UI changes.
 
-1. An AI agent explores the interface in a browser.
-2. The backend stores the action trace step by step.
-3. The system generates an automated test from the saved trace.
-4. The generated test is rerun in a deterministic execution flow.
-5. The team receives screenshots, timeline events, and final run artifacts.
+As a result, teams often lack reliable regression coverage for critical interaction flows.
 
-This makes it possible to move from exploratory UI checking to repeatable regression coverage much faster.
+---
 
-## Demo Scenario
+# Solution
+
+The system provides an AI-assisted QA pipeline.
+
+1. The user describes the verification goal and configures the reasoning level for the agent.
+2. The AI agent explores the interface inside a browser environment, interacting with the UI similarly to a human user.
+3. During exploration the agent forms hypotheses about possible checks and interacts with elements accordingly.
+4. The generated test can later be rerun in a deterministic execution mode (via timer or other triggers).
+5. After execution the team receives a final report.
+
+The report includes either:
+
+- confirmation of successful execution, or  
+- recommendations describing problems detected during the agent or script execution.
+
+This approach allows teams to move much faster from exploratory UI testing to repeatable regression coverage.
+
+Additionally, it helps evaluate how understandable and usable the interface is from the perspective of an autonomous agent.
+
+---
+
+# Demo Scenario
 
 Current public target:
 
 `https://tonconnect-sdk-demo-dapp.vercel.app/`
 
-Current validated flow:
+Validated interaction flow:
 
 1. Open the official TON Connect demo dApp.
 2. Switch `Any Network` to `Testnet`.
@@ -66,41 +87,80 @@ Current validated flow:
 7. Generate an autotest from the trace.
 8. Rerun the generated autotest and inspect run artifacts.
 
-This flow has already been validated end-to-end in the core product.
+This scenario has already been validated end-to-end in the core product.
 
-## What Makes It Different
+The demo shows:
 
-This is not a simple click recorder. The interface is first explored by an AI agent, and the resulting trace becomes the source for a separate repeatable automated test. That makes the system closer to AI-assisted QA infrastructure than to a basic record-and-replay utility.
+- how the agent reasons about the interface  
+- how it interacts with UI elements  
+- how high-quality grounding enables reliable UI interaction
 
-## Repository Contents
+---
 
-- [`ARCHITECTURE.md`](./ARCHITECTURE.md) - high-level system structure and component responsibilities
-- [`DEMO.md`](./DEMO.md) - live demo walkthrough and expected results
-- [`ADDITIONAL_NOTES.md`](./ADDITIONAL_NOTES.md) - notes for judges about the private core implementation
+# What Makes It Different
 
-## Private Core Notice
+This is not a simple click recorder.
 
-The core implementation of the product is currently private. This public repository is a showcase repository for the hackathon submission and intentionally contains:
+The interface is first explored by an AI agent capable of reasoning about UI elements and forming interaction hypotheses.
+
+The resulting interaction trace becomes the source for a separate repeatable automated test.
+
+This makes the system closer to **AI-assisted QA infrastructure** rather than a traditional record-and-replay tool.
+
+---
+
+# Repository Contents
+
+- [`ARCHITECTURE.md`](./ARCHITECTURE.md) — system architecture and component responsibilities  
+- [`DEMO.md`](./DEMO.md) — demo walkthrough and expected results  
+- [`ADDITIONAL_NOTES.md`](./ADDITIONAL_NOTES.md) — notes for hackathon judges about the private implementation  
+
+---
+
+# Private Core Notice
+
+The core implementation of the product is currently private.
+
+This repository serves as a **public showcase repository** for the hackathon submission and intentionally contains:
 
 - product overview
 - architecture summary
 - validated demo flow
 - submission-facing documentation
 
-The private repository contains the production backend, browser runtime, trace-to-test generation flow, and internal integrations.
+The private repository contains:
 
-## Current Status
+- production backend
+- browser runtime
+- trace-to-test generation pipeline
+- internal integrations
 
-The MVP already works end-to-end on the public TON Connect demo target:
+---
 
-- exploratory run works
-- action trace is captured
-- autotest generation works
-- generated test rerun works
-- artifacts are available for inspection
+# Current Status
 
-## Scope of This Submission
+The MVP already works end-to-end on the public TON Connect demo target.
 
-The current submission focuses on QA infrastructure for Telegram Mini Apps and TON-related web flows. It does not focus on TON payments or on a consumer-facing chat agent. The core value is the pipeline:
+Current capabilities include:
 
-`explore -> trace -> generate test -> rerun -> inspect artifacts`
+- exploratory agent run
+- interaction trace capture
+- autotest generation
+- deterministic test rerun
+- artifact inspection
+
+---
+
+# Scope of This Submission
+
+This submission focuses on **QA infrastructure for Telegram Mini Apps and TON-related web flows**.
+
+It does not focus on TON payments or on a consumer-facing chat agent.
+
+The core value of the system is the pipeline:
+
+```
+
+explore -> trace -> generate test -> rerun -> inspect artifacts
+
+```
