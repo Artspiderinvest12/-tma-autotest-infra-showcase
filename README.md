@@ -51,9 +51,9 @@ As a result, teams often lack reliable regression coverage for critical interact
 
 # Solution
 <p align="center">
-  <img src="images/menu.jpg" width="420"/>
+  <img src="images/menu.jpg" width="620"/>
 </p>
-The system provides an AI-assisted QA pipeline.
+The system provides an AI-assisted QA pipeline:
 
 1. The user describes the verification goal and configures the reasoning level for the agent.
 2. The AI agent explores the interface inside a browser environment, interacting with the UI similarly to a human user.
