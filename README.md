@@ -1,5 +1,14 @@
 # TMA Autotest Infra
+![Hackathon](https://img.shields.io/badge/TON-Hackathon-black)
+![Track](https://img.shields.io/badge/Track-Agent%20Infrastructure-blue)
+![License](https://img.shields.io/badge/License-MIT-yellow)
+![Node](https://img.shields.io/badge/Node.js-20-green)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue)
 ![OperatorVLM](images/logo.jpg)
+[![Demo](https://img.shields.io/badge/Demo-Open-green)](https://your-demo-link.com)
+[![Telegram](https://img.shields.io/badge/Telegram-Bot-blue)](https://t.me/your_bot)
+[![Docs](https://img.shields.io/badge/Docs-Architecture-lightgrey)](ARCHITECTURE.md)
 AI QA infrastructure for Telegram Mini Apps and TON-related web flows.
 
 The product turns an exploratory browser session completed by an AI agent into a repeatable automated regression test. The system captures the action trace, generates an autotest from that trace, reruns the generated script, and stores run artifacts such as screenshots, timeline events, and diagnostics.
