@@ -107,7 +107,7 @@ The browser runtime provides the execution surface for the agent. It exposes the
 This layer is where reasoning becomes action.
 
 for example click_xy tool:
-'''python
+```python
 @app.post("/click_xy")
 async def click_xy(xy: dict):
     """
@@ -367,7 +367,7 @@ async def click_xy(xy: dict):
         "clicked_probe": probe,
         "coord_calib": dict(COORD_CALIB),
     }
-'''
+```
 
 ### 3. Backend Orchestration
 
