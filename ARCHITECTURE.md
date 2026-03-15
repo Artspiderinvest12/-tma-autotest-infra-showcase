@@ -106,6 +106,269 @@ The browser runtime provides the execution surface for the agent. It exposes the
 
 This layer is where reasoning becomes action.
 
+for example click_xy tool:
+'''python
+@app.post("/click_xy")
+async def click_xy(xy: dict):
+    """
+    Экранные координаты (root Xvfb) -> физический клик (xdotool).
+    Телеметрия элемента:
+      - основной источник истины: pointerdown probe (clicked_probe.target)
+      - fallback: document.elementFromPoint() по screen->client маппингу (калибровка -> эвристика)
+    """
+
+    def _is_target_closed(e: Exception) -> bool:
+        s = repr(e)
+        return (
+            ("TargetClosedError" in s)
+            or ("has been closed" in s)
+            or ("Execution context was destroyed" in s)
+            or ("most likely because of a navigation" in s)
+        )
+
+    telemetry_errors: list[dict] = []
+
+    def _tel_err(stage: str, err: str):
+        telemetry_errors.append({"stage": stage, "error": err})
+
+    async def _safe_eval_on_page(page: Page, script: str, arg=None, retries: int = 1):
+        """
+        Выполняем eval на конкретной page.
+        Если target закрылся — пробуем переоткрыть page и повторить.
+        """
+        last = None
+        p = page
+        for _ in range(retries + 1):
+            if not p or p.is_closed():
+                p = await get_alive_page()
+                if not p:
+                    return None, "no_active_page"
+                try:
+                    await p.bring_to_front()
+                except Exception:
+                    pass
+            try:
+                if arg is None:
+                    v = await _eval_pw_or_cdp(p, script)
+                else:
+                    v = await _eval_pw_or_cdp(p, script, arg)
+                return v, None
+            except Exception as e:
+                last = e
+                if _is_target_closed(e):
+                    await asyncio.sleep(0.05)
+                    continue
+                return None, f"eval_error:{e}"
+        return None, f"eval_retry_exhausted:{last}"
+
+    # ---------- parse coords ----------
+    try:
+        x = int(float(xy.get("x")))
+        y = int(float(xy.get("y")))
+    except Exception:
+        return {"status": "failed", "error": "bad_xy_payload"}
+
+    # ---------- get page ----------
+    p = await get_alive_page()
+    if not p:
+        return {"status": "failed", "error": "no_active_page"}
+
+    # best-effort: активируем вкладку
+    try:
+        await p.bring_to_front()
+    except Exception:
+        pass
+
+    # ---------- install click probe (best-effort) ----------
+    try:
+        await _eval_pw_or_cdp(p, CLICK_PROBE_INSTALL_JS)
+    except Exception as e:
+        _tel_err("click_probe_install", f"eval_error:{e}")
+
+    # ---------- screen -> client mapping for elementFromPoint fallback ----------
+    vx = vy = None
+    vp_meta = None
+
+    mapped = _screen_to_client_xy_using_calib(x, y)
+    if mapped is not None:
+        vx, vy = mapped
+        vp_meta = {"source": "probe_calib", **COORD_CALIB}
+    else:
+        try:
+            _vx, _vy, vp_meta = await _screen_xy_to_viewport_xy_precise(p, x, y)
+            if 0 <= _vx < 100000 and 0 <= _vy < 100000:
+                vx, vy = _vx, _vy
+        except Exception as e:
+            vp_meta = {"error": f"screen_to_viewport_failed:{e!r}"}
+
+    # ---------- element (fallback, ДО клика) ----------
+    el_before = None
+    if vx is not None and vy is not None:
+        el_before, err = await _safe_eval_on_page(
+            p,
+            """
+            (p)=>{
+              const {x,y} = p;
+              const e = document.elementFromPoint(x,y);
+              if (!e) return null;
+              const r = e.getBoundingClientRect();
+
+              const role = e.getAttribute('role') || e.tagName.toLowerCase();
+              const name =
+                e.getAttribute('aria-label') ||
+                e.getAttribute('title') ||
+                (e.innerText||'').trim().slice(0,120) || null;
+
+              const tag = e.tagName.toLowerCase();
+              const type =
+                e.type || (
+                  tag === 'button' ? 'button' :
+                  tag === 'a' ? 'link' :
+                  tag === 'input' ? 'input' :
+                  tag === 'select' ? 'select' :
+                  tag === 'textarea' ? 'textarea' : 'generic'
+                );
+
+              const sameType = Array.from(document.querySelectorAll(tag));
+              const index = sameType.indexOf(e) + 1;
+
+              return {
+                tag, type, role, name,
+                index, total: sameType.length,
+                cls: e.className || '',
+                bbox: {x:r.x, y:r.y, w:r.width, h:r.height}
+              };
+            }
+            """,
+            {"x": int(vx), "y": int(vy)},
+            retries=1,
+        )
+        if err:
+            _tel_err("element_eval", err)
+            el_before = None
+    else:
+        _tel_err("element_eval", "point_outside_viewport_or_no_mapping")
+
+    # ---------- BEFORE telemetry ----------
+    before, err = await _safe_eval_on_page(
+        p,
+        """
+        () => {
+          const active = document.activeElement ? document.activeElement.tagName.toLowerCase() : null;
+          const txt = (document.body && document.body.innerText) ? document.body.innerText : "";
+          return { url: location.href, active, textLen: txt.length };
+        }
+        """,
+        retries=1,
+    )
+    if err:
+        _tel_err("before_eval", err)
+        before = None
+
+    # ---------- PHYSICAL CLICK (screen coords) ----------
+    sx, sy = x, y
+    ok, click_err = await _os_click_xy(sx, sy, hold_ms=40)
+    if not ok:
+        return {
+            "status": "failed",
+            "error": click_err,
+            "clicked": {"x": x, "y": y},
+            "telemetry_partial": bool(telemetry_errors),
+            "telemetry_errors": telemetry_errors,
+        }
+
+    # ---------- read probe (истина) ----------
+    await asyncio.sleep(0.03)  # дать pointerdown записаться
+    probe = None
+    try:
+        probe = await _eval_pw_or_cdp(p, CLICK_PROBE_READ_JS)
+    except Exception as e:
+        _tel_err("click_probe_read", f"eval_error:{e}")
+        probe = None
+
+    # ---------- update calibration from probe ----------
+    if isinstance(probe, dict):
+        off = probe.get("screen_to_client_offset_css")
+        if isinstance(off, dict) and ("dx" in off) and ("dy" in off):
+            async with COORD_CALIB_LOCK:
+                COORD_CALIB["dx"] = float(off.get("dx") or 0.0)
+                COORD_CALIB["dy"] = float(off.get("dy") or 0.0)
+                COORD_CALIB["dpr"] = float(probe.get("dpr") or 1.0)
+                COORD_CALIB["ts"] = int(probe.get("ts") or 0)
+                COORD_CALIB["url"] = probe.get("url")
+
+    # ---------- AFTER telemetry ----------
+    after, err = await _safe_eval_on_page(
+        p,
+        """
+        () => {
+          const active = document.activeElement ? document.activeElement.tagName.toLowerCase() : null;
+          const txt = (document.body && document.body.innerText) ? document.body.innerText : "";
+          const popupCandidates = Array.from(document.querySelectorAll(
+            'dialog[open],[role="dialog"],[aria-modal="true"],[role="menu"],[role="listbox"]'
+          ));
+          const isVisible = (el) => {
+            if (!(el instanceof HTMLElement)) return false;
+            const st = getComputedStyle(el);
+            if (st.display === "none" || st.visibility === "hidden" || Number(st.opacity || "1") < 0.05) return false;
+            const r = el.getBoundingClientRect();
+            return r.width > 4 && r.height > 4;
+          };
+          const hasPopup = popupCandidates.some(isVisible);
+          return { url: location.href, active, textLen: txt.length, hasPopup };
+        }
+        """,
+        retries=1,
+    )
+    if err:
+        _tel_err("after_eval", err)
+        after = None
+
+    # ---------- signals ----------
+    if isinstance(before, dict) and isinstance(after, dict):
+        url_changed = (after.get("url") != before.get("url"))
+        focus_changed = (after.get("active") != before.get("active"))
+        text_changed = (after.get("textLen") != before.get("textLen"))
+        popup_visible = bool(after.get("hasPopup"))
+        activated = bool(url_changed or popup_visible or (focus_changed and text_changed))
+
+        signals = {
+            "url_changed": url_changed,
+            "focus_changed": focus_changed,
+            "viewport_text_changed": text_changed,
+            "popup_visible": popup_visible,
+        }
+    else:
+        activated = None
+        signals = {
+            "url_changed": None,
+            "focus_changed": None,
+            "viewport_text_changed": None,
+            "popup_visible": None,
+        }
+
+    # ---------- choose aria: probe target > elementFromPoint fallback ----------
+    aria_real = None
+    if isinstance(probe, dict) and isinstance(probe.get("target"), dict):
+        aria_real = probe["target"]
+    else:
+        aria_real = el_before
+
+    return {
+        "status": "success",
+        "clicked": {"x": x, "y": y, "aria": aria_real},
+        "activated": activated,
+        "signals": signals,
+        "telemetry_partial": bool(telemetry_errors),
+        "telemetry_errors": telemetry_errors,
+        "telemetry": {"before": before, "after": after},
+        "coord_map": None,
+        "viewport_xy": {"x": vx, "y": vy, "meta": vp_meta},
+        "clicked_probe": probe,
+        "coord_calib": dict(COORD_CALIB),
+    }
+'''
+
 ### 3. Backend Orchestration
 
 The backend coordinates the lifecycle of each run:
