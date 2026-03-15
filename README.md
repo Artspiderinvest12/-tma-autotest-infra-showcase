@@ -81,7 +81,13 @@ Current public target:
 Validated interaction flow:
 
 <p align="center">
+<a href="https://youtu.be/AuMUIWpe7jE">
   <img src="images/specs.jpg" width="420"/>
+</a>
+</p>
+
+<p align="center">
+▶ Watch demo
 </p>
 
 1. Open the official TON Connect demo dApp.
