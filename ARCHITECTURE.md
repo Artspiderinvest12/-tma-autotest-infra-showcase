@@ -70,14 +70,24 @@ In compact form:
 
 ### 1. Agent Core
 
-The agent core is responsible for exploratory task execution. It combines:
+The agent core is responsible for executing exploratory tasks and acts as the central intelligence component of the system.
+
+It combines:
 
 - task understanding
 - step-by-step reasoning
 - browser tool selection
 - completion detection
 
-The agent is optimized for actionability, not just text generation. Its purpose is to interact with the interface and produce a usable execution trace.
+The agent is optimized for actionability rather than pure text generation. Its primary purpose is to interact with the interface and produce a meaningful execution trace.
+
+The agent architecture is tool-extendable. Additional tools can be attached to the agent to interact with the browser environment, including mechanisms such as XPath queries, DOM locators, and other interface interaction utilities.
+
+The reasoning depth of the agent can be configured depending on the complexity of the task. This allows balancing exploration quality with execution speed for different scenarios.
+
+Model providers are accessed through **OpenRouter**, which allows the system to dynamically switch between different LLM or VLM models depending on the task requirements.
+
+The agent also includes a memory summarization mechanism. This allows long-running sessions to compress historical context and maintain operational continuity, enabling autonomous operation for extended periods (up to ~24 hours in long exploratory runs).
 
 ### 2. Browser Tooling and Runtime
 
