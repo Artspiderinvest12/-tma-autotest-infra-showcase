@@ -2,7 +2,7 @@
 
 
 <p align="center">
-  <img src="images/logo.jpg" width="620"/>
+  <img src="images/logo.jpg" width="320"/>
 </p>
 
 <p align="center">
@@ -51,7 +51,7 @@ As a result, teams often lack reliable regression coverage for critical interact
 
 # Solution
 <p align="center">
-  <img src="images/menu.jpg" width="620"/>
+  <img src="images/menu.jpg" width="320"/>
 </p>
 The system provides an AI-assisted QA pipeline:
 
