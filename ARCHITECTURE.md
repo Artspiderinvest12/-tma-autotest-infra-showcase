@@ -80,7 +80,7 @@ It combines:
 - completion detection
 
 <p align="center">
-  <img src="images/task.jpg" width="500"/>
+  <img src="images/task.png" width="500"/>
 </p>
 The agent is optimized for actionability rather than pure text generation. Its primary purpose is to interact with the interface and produce a meaningful execution trace.
 
