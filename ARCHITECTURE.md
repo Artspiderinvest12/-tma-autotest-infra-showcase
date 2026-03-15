@@ -79,6 +79,9 @@ It combines:
 - browser tool selection
 - completion detection
 
+<p align="center">
+  <img src="images/task.jpg" width="500"/>
+</p>
 The agent is optimized for actionability rather than pure text generation. Its primary purpose is to interact with the interface and produce a meaningful execution trace.
 
 The agent architecture is tool-extendable. Additional tools can be attached to the agent to interact with the browser environment, including mechanisms such as XPath queries, DOM locators, and other interface interaction utilities.
