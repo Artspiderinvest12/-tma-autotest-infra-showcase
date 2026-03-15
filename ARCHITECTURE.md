@@ -35,15 +35,9 @@ This makes the system suitable for flows where structure and appearance both mat
 
 ### Reasoning + Action Loop
 
-```mermaid
-flowchart LR
-    S[Screenshot] --> M[CUA Model]
-    M --> T["Computer tool call<br/>type: click<br/>button: left<br/>x: 286<br/>y: 102"]
-    T --> A[Application code]
-    A --> C["Action<br/>click left 286, 102"]
-    C --> E[Computer environment]
-    E --> S
-```
+<p align="center">
+  <img src="images/cua_diagram.png" width="420"/>
+</p>
 
 The agent loop is built around iterative decision making instead of static scripted steps. In practice, this means the system can:
 
