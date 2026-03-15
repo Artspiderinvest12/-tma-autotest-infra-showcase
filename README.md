@@ -1,5 +1,5 @@
 # TMA Autotest Infra
-
+![OperatorVLM](images/logo.jpg)
 AI QA infrastructure for Telegram Mini Apps and TON-related web flows.
 
 The product turns an exploratory browser session completed by an AI agent into a repeatable automated regression test. The system captures the action trace, generates an autotest from that trace, reruns the generated script, and stores run artifacts such as screenshots, timeline events, and diagnostics.
