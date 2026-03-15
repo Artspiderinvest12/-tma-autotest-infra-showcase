@@ -36,7 +36,7 @@ This makes the system suitable for flows where structure and appearance both mat
 ### Reasoning + Action Loop
 
 <p align="center">
-  <img src="images/cua_diagram.png" width="420"/>
+  <img src="images/cua_diagram.png" width="600"/>
 </p>
 
 The agent loop is built around iterative decision making instead of static scripted steps. In practice, this means the system can:
